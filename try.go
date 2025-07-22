@@ -38,9 +38,9 @@ func guessProjectPathPrefix() string {
 	return ""
 }
 
-func printMyStackAuto() string {
+func printMyStackAuto(step int) string {
 	pcs := make([]uintptr, 16)
-	n := runtime.Callers(3, pcs)
+	n := runtime.Callers(step, pcs)
 	frames := runtime.CallersFrames(pcs[:n])
 
 	for {
@@ -57,6 +57,6 @@ func printMyStackAuto() string {
 
 func Try(f func(err any)) {
 	if err := recover(); err != nil {
-		f(printMyStackAuto())
+		f(printMyStackAuto(3))
 	}
 }
