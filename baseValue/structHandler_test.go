@@ -9,6 +9,7 @@ package baseValue
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -49,4 +50,26 @@ func TestStructGetTagValueNames(t *testing.T) {
 		Name string `db:"name" json:"name" default:"nihao"`
 	}
 	fmt.Println(StructGetTagValueNames(&Uyd{}, "db"))
+}
+
+type Location struct {
+	Province *string `json:"province"`
+	City     *string `json:"city"`
+}
+
+func (Location) GetCity() string {
+	return "ius"
+}
+
+func TestMakeService(t *testing.T) {
+	var provvince = "黄山"
+	uy := Location{
+		Province: &provvince,
+	}
+	dr := MakeService(&uy)
+	for name, i := range dr.Attr {
+		fmt.Println(name, i.Interface())
+	}
+	de := dr.Method["GetCity"].Func.Call([]reflect.Value{dr.Rcvr})
+	fmt.Println(de)
 }

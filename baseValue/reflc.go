@@ -7,29 +7,6 @@ import (
 	"strings"
 )
 
-type Method struct {
-	Servers map[string]reflect.Method
-	Rcvr    reflect.Value
-	Typ     reflect.Type
-}
-
-// MakeService rep 的 传入 指针 非指针都可以
-// 解析对象的 方法 可以通过 map的形式执行
-func MakeService(rep interface{}) *Method {
-	ser := Method{}
-	ser.Typ = reflect.TypeOf(rep)
-	ser.Rcvr = reflect.ValueOf(rep)
-	//name := reflect.Indirect(ser.Rcvr).Type().Name()
-	ser.Servers = map[string]reflect.Method{}
-	for i := 0; i < ser.Typ.NumMethod(); i++ {
-		method := ser.Typ.Method(i)
-		mname := method.Name // string
-		ser.Servers[mname] = method
-	}
-
-	return &ser
-}
-
 // 任意数据转化为 字符串
 func AnyToString(value any, spacing []byte) (string, error) {
 	if value == nil {

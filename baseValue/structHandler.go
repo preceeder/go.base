@@ -5,6 +5,43 @@ import (
 	"strings"
 )
 
+type StructMap struct {
+	Method map[string]reflect.Method
+	Attr   map[string]reflect.Value
+	Rcvr   reflect.Value
+	Typ    reflect.Type
+}
+
+// MakeService rep 的 传入 指针 非指针都可以
+// 解析对象的 方法 可以通过 map的形式执行
+func MakeService(rep interface{}) *StructMap {
+	ser := StructMap{}
+	ser.Typ = reflect.TypeOf(rep)
+	ser.Rcvr = reflect.ValueOf(rep)
+	value := ser.Rcvr
+	if value.Kind() == reflect.Ptr {
+		value = ser.Rcvr.Elem()
+	}
+
+	ser.Attr = map[string]reflect.Value{}
+	tp := ReflectBaseType(ser.Typ)
+
+	for i := 0; i < tp.NumField(); i++ {
+		val := value.Field(i)
+		mname := tp.Field(i).Name // string
+		ser.Attr[mname] = val
+	}
+
+	ser.Method = map[string]reflect.Method{}
+	for i := 0; i < ser.Typ.NumMethod(); i++ {
+		method := ser.Typ.Method(i)
+		mname := method.Name // string
+		ser.Method[mname] = method
+	}
+
+	return &ser
+}
+
 func StructConvertToStructWithTag(output any, tag string, weaklyTypedInput bool, input ...any) error {
 	config := &DecoderConfig{
 		Metadata:         nil,
